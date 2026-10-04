@@ -1,21 +1,28 @@
-from pathlib import Path
 from pypdf import PdfReader
+from rag.loaders.chunker import chunk_text
 
 
-def load_pdf(file_path: str) -> str:
-    path = Path(file_path)
+def load_pdf(file_path):
+    """
+    Load a PDF and split it into chunks while preserving page numbers.
+    """
 
-    if not path.exists():
-        raise FileNotFoundError(f"File not found: {file_path}")
+    reader = PdfReader(file_path)
 
-    reader = PdfReader(str(path))
+    all_chunks = []
 
-    text = ""
+    for page_number, page in enumerate(reader.pages, start=1):
 
-    for page in reader.pages:
-        page_text = page.extract_text()
+        text = page.extract_text()
 
-        if page_text:
-            text += page_text + "\n"
+        if not text:
+            continue
 
-    return text
+        chunks = chunk_text(
+            text,
+            page_number=page_number
+        )
+
+        all_chunks.extend(chunks)
+
+    return all_chunks
