@@ -1,118 +1,235 @@
-from rag.embeddings.embedding_model import get_embedding
-from rag.generation.llm import generate_answer
-from rag.retrieval.retriever import Retriever
+from pathlib import Path
+
+from rag.config import (
+    UPLOAD_DIR,
+    INDEX_DIR,
+    CHUNK_SIZE,
+    CHUNK_OVERLAP,
+    TOP_K
+)
+
+from rag.loaders.document_loader import (
+    load_pdf,
+    chunk_documents
+)
+
+from rag.embeddings.embedding_model import (
+    EmbeddingModel
+)
+
+from rag.retrieval.retriever import (
+    Retriever
+)
+
+from rag.generation.llm import (
+    GeminiLLM
+)
 
 
-def ask_question(question, index_path, documents_path):
-    """
-    Retrieve relevant chunks from the saved FAISS index
-    and generate a source-aware answer.
-    """
+# =========================
+# INDEX FILES
+# =========================
 
-    # --------------------------------
-    # Load saved FAISS index
-    # --------------------------------
+INDEX_PATH = INDEX_DIR / "studysync.index"
 
-    retriever = Retriever()
+METADATA_PATH = INDEX_DIR / "metadata.json"
 
-    retriever.load(
-        index_path,
-        documents_path
-    )
 
-    # --------------------------------
-    # Create embedding for question
-    # --------------------------------
+class RAGPipeline:
 
-    question_embedding = get_embedding(question)
+    def __init__(self):
 
-    # --------------------------------
-    # Retrieve relevant chunks
-    # --------------------------------
+        print("\nInitializing StudySync AI...\n")
 
-    relevant_chunks = retriever.search(
-        question_embedding,
-        top_k=3
-    )
+        self.embedding_model = EmbeddingModel()
 
-    # --------------------------------
-    # Build context
-    # --------------------------------
-
-    context_parts = []
-
-    for i, chunk in enumerate(relevant_chunks, start=1):
-
-        context_parts.append(
-            f"""
-SOURCE {i}
-Page: {chunk['page']}
-
-{chunk['text']}
-"""
+        self.retriever = Retriever(
+            INDEX_PATH,
+            METADATA_PATH
         )
 
-    context = "\n\n".join(context_parts)
+        self.llm = GeminiLLM()
 
-    # --------------------------------
-    # Build RAG prompt
-    # --------------------------------
+    # =========================
+    # BUILD KNOWLEDGE BASE
+    # =========================
 
-    prompt = f"""
-You are StudySync AI, an AI tutor.
+    def build_index(self, pdf_paths):
+        all_chunks = []
 
-Answer the user's question using ONLY the study material provided below.
+        for pdf_path in pdf_paths:
+            print("\n" + "=" * 50)
+            print(f"Loading PDF: {pdf_path.name}")
+            print("=" * 50)
 
-STUDY MATERIAL:
-{context}
+            documents = load_pdf(pdf_path)
 
-USER QUESTION:
-{question}
+            print(f"Loaded {len(documents)} pages.")
 
-INSTRUCTIONS:
+            print("\nCreating chunks...")
+            chunks = chunk_documents(
+                documents,
+                CHUNK_SIZE,
+                CHUNK_OVERLAP
+            )
 
-1. Give a clear and accurate answer.
-2. Explain the concept in a student-friendly way.
-3. Do not invent information.
-4. If the answer cannot be found in the study material, say:
-   "I couldn't find enough information in the provided study material."
-5. At the end, provide the source pages used.
-6. Use this format:
+            print(f"Created {len(chunks)} chunks.")
 
-Answer:
-[your answer]
+            all_chunks.extend(chunks)
 
-Sources:
-- Page X
-- Page Y
+        print("\n" + "=" * 50)
+        print(f"TOTAL CHUNKS FROM ALL PDFs: {len(all_chunks)}")
+        print("=" * 50)
 
-Only mention pages that actually support your answer.
-"""
+        texts = [chunk["text"] for chunk in all_chunks]
 
-    # --------------------------------
-    # Generate answer
-    # --------------------------------
+        print("\nCreating embeddings...")
+        embeddings = self.embedding_model.embed_documents(texts)
 
-    answer = generate_answer(prompt)
+        print("Embeddings created.")
 
-    return answer
+        self.retriever.build_index(
+            embeddings,
+            all_chunks
+        )
+
+        self.retriever.save()
+
+        print("\nKnowledge base created successfully.")
+    # =========================
+    # LOAD EXISTING INDEX
+    # =========================
+
+    def load_existing_index(self):
+
+        return self.retriever.load()
+
+    # =========================
+    # ASK QUESTION
+    # =========================
+
+    def ask(self, question):
+
+        # Create embedding for question
+        query_embedding = (
+            self.embedding_model
+            .embed_query(question)
+        )
+
+        # Search relevant chunks
+        results = self.retriever.search(
+            query_embedding,
+            TOP_K
+        )
+
+        if not results:
+
+            return {
+                "answer": (
+                    "I couldn't find relevant "
+                    "information in your study material."
+                ),
+                "sources": []
+            }
+
+        # Build context
+        context_parts = []
+
+        sources = []
+
+        for result in results:
+
+            context_parts.append(
+                result["text"]
+            )
+
+            sources.append({
+                "source": result["source"],
+                "page": result["page"],
+                "score": result["score"]
+            })
+
+        context = "\n\n".join(
+            context_parts
+        )
+
+        # Generate answer
+        answer = self.llm.generate(
+            question,
+            context
+        )
+
+        return {
+            "answer": answer,
+            "sources": sources
+        }
+
+
+# =========================
+# RUN FROM TERMINAL
+# =========================
 
 if __name__ == "__main__":
 
-    print("================================")
-    print("StudySync AI RAG Pipeline")
-    print("================================")
+    pipeline = RAGPipeline()
 
-    question = input("\nAsk a question about your study material:\n> ")
-
-    answer = ask_question(
-        question=question,
-        index_path="data/index/faiss.index",
-        documents_path="data/index/documents.pkl"
+    # Try loading existing index
+    index_exists = (
+        pipeline.load_existing_index()
     )
 
-    print("\n================================")
-    print("ANSWER")
-    print("================================")
-    print(answer)
+    # If no index exists, build one
+    if not index_exists:
 
+        pdf_files = list(
+            Path(UPLOAD_DIR).glob("*.pdf")
+        )
+
+        if not pdf_files:
+
+            print(
+                "\nNo PDF found in:"
+            )
+
+            print(UPLOAD_DIR)
+
+            print(
+                "\nPut a PDF inside the uploads folder."
+            )
+
+            raise SystemExit
+
+        # Use the first PDF for now
+        pdf_path = pdf_files[0]
+
+        pipeline.build_index(
+            pdf_path
+        )
+
+    # Ask question
+    question = input(
+        "\nAsk StudySync AI: "
+    )
+
+    result = pipeline.ask(
+        question
+    )
+
+    print("\n")
+    print("=" * 50)
+    print("STUDYSYNC AI")
+    print("=" * 50)
+
+    print("\nAnswer:\n")
+
+    print(result["answer"])
+
+    print("\nSources:\n")
+
+    for source in result["sources"]:
+
+        print(
+            f"- {source['source']} "
+            f"(Page {source['page']}) "
+            f"[score: {source['score']:.3f}]"
+        )

@@ -1,75 +1,65 @@
-
 import os
-import time
 
 from dotenv import load_dotenv
 from google import genai
 
+from rag.config import GEMINI_MODEL
+
 
 load_dotenv()
 
-api_key = os.getenv("GEMINI_API_KEY")
 
-if not api_key:
-    raise ValueError(
-        "GEMINI_API_KEY not found. Check your backend/.env file."
-    )
+class GeminiLLM:
 
+    def __init__(self):
 
-client = genai.Client(api_key=api_key)
+        api_key = os.getenv("GEMINI_API_KEY")
 
-
-def generate_answer(prompt: str) -> str:
-    """
-    Generate an answer using Gemini Chat API.
-    """
-
-    max_retries = 3
-
-    for attempt in range(max_retries):
-
-        try:
-
-            chat = client.chats.create(
-                model="gemini-3.8-flash"
+        if not api_key:
+            raise ValueError(
+                "GEMINI_API_KEY is not set."
             )
 
-            response = chat.send_message(
-                message=prompt
-            )
+        self.client = genai.Client(
+            api_key=api_key
+        )
 
-            if response.text:
-                return response.text
+    def generate(self, question, context):
 
-            return "Gemini returned an empty response."
+        prompt = f"""
+You are StudySync AI, an educational AI tutor.
 
-        except Exception as e:
+Answer the student's question using ONLY the
+provided study material.
 
-            error_message = str(e)
+Rules:
+1. Do not invent information.
+2. If the answer is not present in the material,
+   say that you could not find it in the uploaded
+   study material.
+3. Explain concepts clearly and simply.
+4. Use the context below as your primary source.
 
-            print(f"Gemini error: {error_message}")
+========================
+STUDY MATERIAL
+========================
 
-            # Retry temporary connection/server errors
-            retryable = (
-                "503" in error_message
-                or "UNAVAILABLE" in error_message
-                or "10053" in error_message
-                or "ReadError" in error_message
-            )
+{context}
 
-            if not retryable:
-                raise
+========================
+STUDENT QUESTION
+========================
 
-            if attempt == max_retries - 1:
-                return (
-                    "Gemini is temporarily unavailable. "
-                    "Please try again in a moment."
-                )
+{question}
 
-            wait_time = 2 ** attempt
+========================
+ANSWER
+========================
+"""
 
-            print(
-                f"Retrying Gemini in {wait_time} seconds..."
-            )
+        response = self.client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt
+        )
 
-            time.sleep(wait_time)
+        return response.text

@@ -1,28 +1,73 @@
+from pathlib import Path
 from pypdf import PdfReader
-from rag.loaders.chunker import chunk_text
 
 
-def load_pdf(file_path):
+def load_pdf(file_path: str):
     """
-    Load a PDF and split it into chunks while preserving page numbers.
+    Extract text from a PDF page by page.
     """
 
-    reader = PdfReader(file_path)
+    file_path = Path(file_path)
 
-    all_chunks = []
+    if not file_path.exists():
+        raise FileNotFoundError(
+            f"PDF not found: {file_path}"
+        )
+
+    reader = PdfReader(str(file_path))
+
+    documents = []
 
     for page_number, page in enumerate(reader.pages, start=1):
 
         text = page.extract_text()
 
-        if not text:
-            continue
+        if text and text.strip():
 
-        chunks = chunk_text(
-            text,
-            page_number=page_number
-        )
+            documents.append({
+                "text": text.strip(),
+                "page": page_number,
+                "source": file_path.name
+            })
 
-        all_chunks.extend(chunks)
+    return documents
 
-    return all_chunks
+
+def chunk_documents(
+    documents,
+    chunk_size: int = 500,
+    chunk_overlap: int = 50
+):
+    """
+    Split documents into overlapping chunks.
+    """
+
+    chunks = []
+    chunk_id = 0
+
+    for document in documents:
+
+        text = document["text"]
+
+        start = 0
+
+        while start < len(text):
+
+            end = start + chunk_size
+
+            chunk_text = text[start:end].strip()
+
+            if chunk_text:
+
+                chunks.append({
+                    "chunk_id": chunk_id,
+                    "text": chunk_text,
+                    "page": document["page"],
+                    "source": document["source"]
+                })
+
+                chunk_id += 1
+
+            start += chunk_size - chunk_overlap
+
+    return chunks

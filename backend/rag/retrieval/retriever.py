@@ -1,92 +1,273 @@
+
+import json
+from pathlib import Path
+
 import faiss
 import numpy as np
-import pickle
-import os
 
 
 class Retriever:
 
-    def __init__(self):
+    def __init__(self, index_path, metadata_path):
+
+        self.index_path = Path(index_path)
+        self.metadata_path = Path(metadata_path)
+
         self.index = None
-        self.documents = []
+        self.metadata = []
 
-    def build_index(self, documents, embeddings):
+    # =========================
+    # BUILD INDEX
+    # =========================
+
+    def build_index(self, embeddings, chunks):
+
         """
-        Build a FAISS index from document embeddings.
+        Create a completely new FAISS index.
+        The previous index is replaced.
         """
 
-        embeddings = np.array(embeddings).astype("float32")
+        print("\n" + "=" * 50)
+        print("BUILDING NEW VECTOR INDEX")
+        print("=" * 50)
+
+        if not chunks:
+            raise ValueError(
+                "No chunks were provided."
+            )
+
+        embeddings = np.asarray(
+            embeddings,
+            dtype="float32"
+        )
+
+        if embeddings.ndim != 2:
+            raise ValueError(
+                f"Invalid embedding shape: {embeddings.shape}"
+            )
 
         dimension = embeddings.shape[1]
 
-        self.index = faiss.IndexFlatL2(dimension)
+        # Create NEW index
+        self.index = faiss.IndexFlatIP(
+            dimension
+        )
 
-        self.index.add(embeddings)
+        # Add ONLY the new embeddings
+        self.index.add(
+            embeddings
+        )
 
-        self.documents = documents
+        # Replace metadata
+        self.metadata = list(chunks)
 
-    def search(self, query_embedding, top_k=3):
+        print(
+            f"New FAISS index created."
+        )
+
+        print(
+            f"Embedding dimension: {dimension}"
+        )
+
+        print(
+            f"Number of vectors: {self.index.ntotal}"
+        )
+
+        print(
+            f"Number of metadata chunks: {len(self.metadata)}"
+        )
+
+        # Show which files are actually being indexed
+        sources = set()
+
+        for chunk in self.metadata:
+
+            if "source" in chunk:
+                sources.add(
+                    chunk["source"]
+                )
+
+        print(
+            f"Sources in new index: {list(sources)}"
+        )
+
+        print("=" * 50)
+
+    # =========================
+    # SAVE
+    # =========================
+
+    def save(self):
+
         """
-        Search for the most relevant documents.
+        Save FAISS index and metadata.
         """
 
-        query_embedding = np.array(
-            [query_embedding]
-        ).astype("float32")
+        if self.index is None:
+            raise ValueError(
+                "Cannot save an empty index."
+            )
 
-        distances, indices = self.index.search(
+        self.index_path.parent.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        # Save FAISS index
+        faiss.write_index(
+            self.index,
+            str(self.index_path)
+        )
+
+        # Save metadata
+        with open(
+            self.metadata_path,
+            "w",
+            encoding="utf-8"
+        ) as file:
+
+            json.dump(
+                self.metadata,
+                file,
+                indent=2,
+                ensure_ascii=False
+            )
+
+        print("\nIndex and metadata saved.")
+
+        print(
+            f"Index: {self.index_path}"
+        )
+
+        print(
+            f"Metadata: {self.metadata_path}"
+        )
+
+    # =========================
+    # LOAD
+    # =========================
+
+    def load(self):
+
+        """
+        Load existing FAISS index and metadata.
+        """
+
+        if not self.index_path.exists():
+
+            print(
+                "\nNo existing FAISS index found."
+            )
+
+            return False
+
+        if not self.metadata_path.exists():
+
+            print(
+                "\nNo existing metadata found."
+            )
+
+            return False
+
+        self.index = faiss.read_index(
+            str(self.index_path)
+        )
+
+        with open(
+            self.metadata_path,
+            "r",
+            encoding="utf-8"
+        ) as file:
+
+            self.metadata = json.load(
+                file
+            )
+
+        print("\nExisting index loaded.")
+
+        print(
+            f"Vectors: {self.index.ntotal}"
+        )
+
+        print(
+            f"Metadata chunks: {len(self.metadata)}"
+        )
+
+        sources = set()
+
+        for chunk in self.metadata:
+
+            if "source" in chunk:
+                sources.add(
+                    chunk["source"]
+                )
+
+        print(
+            f"Sources in loaded index: {list(sources)}"
+        )
+
+        return True
+
+    # =========================
+    # SEARCH
+    # =========================
+
+    def search(
+        self,
+        query_embedding,
+        top_k=3
+    ):
+
+        """
+        Find the most relevant chunks.
+        """
+
+        if self.index is None:
+
+            raise ValueError(
+                "Index is not loaded."
+            )
+
+        # Don't request more results
+        # than actually exist
+        k = min(
+            top_k,
+            self.index.ntotal
+        )
+
+        if k == 0:
+            return []
+
+        query_embedding = np.asarray(
+            [query_embedding],
+            dtype="float32"
+        )
+
+        scores, indices = self.index.search(
             query_embedding,
-            top_k
+            k
         )
 
         results = []
 
-        for index in indices[0]:
+        for score, index in zip(
+            scores[0],
+            indices[0]
+        ):
 
-            if index < len(self.documents):
-                results.append(self.documents[index])
+            if index == -1:
+                continue
+
+            result = self.metadata[
+                index
+            ].copy()
+
+            result["score"] = float(
+                score
+            )
+
+            results.append(
+                result
+            )
 
         return results
-
-    def save(self, index_path, documents_path):
-        """
-        Save FAISS index and document metadata.
-        """
-
-        if self.index is None:
-            raise ValueError("FAISS index has not been built.")
-
-        faiss.write_index(
-            self.index,
-            index_path
-        )
-
-        with open(documents_path, "wb") as file:
-
-            pickle.dump(
-                self.documents,
-                file
-            )
-
-    def load(self, index_path, documents_path):
-        """
-        Load FAISS index and document metadata.
-        """
-
-        if not os.path.exists(index_path):
-            raise FileNotFoundError(
-                f"FAISS index not found: {index_path}"
-            )
-
-        if not os.path.exists(documents_path):
-            raise FileNotFoundError(
-                f"Documents file not found: {documents_path}"
-            )
-
-        self.index = faiss.read_index(
-            index_path
-        )
-
-        with open(documents_path, "rb") as file:
-
-            self.documents = pickle.load(file)
