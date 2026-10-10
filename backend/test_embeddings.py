@@ -1,6 +1,6 @@
-from rag.loaders.document_loader import load_pdf
-from rag.embeddings.embedding_model import get_embedding
-from rag.retrieval.retriever import Retriever
+from backend.rag.loaders.document_loader import load_pdf
+from backend.rag.embeddings.embedding_model import get_embedding
+from backend.rag.retrieval.retriever import Retriever
 
 
 # 1. Load PDF

@@ -5,8 +5,8 @@ import pickle
 import faiss
 import numpy as np
 
-from rag.loaders.document_loader import load_pdf
-from rag.embeddings.embedding_model import get_embedding
+from backend.rag.loaders.document_loader import load_pdf
+from backend.rag.embeddings.embedding_model import get_embedding
 
 
 PDF_PATH = "data/uploads/test.pdf"

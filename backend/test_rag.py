@@ -1,4 +1,4 @@
-from rag.pipeline import ask_question
+from backend.rag.pipeline import ask_question
 
 
 # --------------------------------

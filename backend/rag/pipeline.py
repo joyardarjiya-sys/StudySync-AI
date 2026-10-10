@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from rag.config import (
+from backend.rag.config import (
     UPLOAD_DIR,
     INDEX_DIR,
     CHUNK_SIZE,
@@ -8,20 +8,20 @@ from rag.config import (
     TOP_K
 )
 
-from rag.loaders.document_loader import (
+from backend.rag.loaders.document_loader import (
     load_pdf,
     chunk_documents
 )
 
-from rag.embeddings.embedding_model import (
+from backend.rag.embeddings.embedding_model import (
     EmbeddingModel
 )
 
-from rag.retrieval.retriever import (
+from backend.rag.retrieval.retriever import (
     Retriever
 )
 
-from rag.generation.llm import (
+from backend.rag.generation.llm import (
     GeminiLLM
 )
 

@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from google import genai
 
-from rag.config import GEMINI_MODEL
+from backend.rag.config import GEMINI_MODEL
 
 
 load_dotenv()

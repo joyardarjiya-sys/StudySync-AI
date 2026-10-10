@@ -1,10 +1,15 @@
 
+from pathlib import Path
+from dotenv import load_dotenv
+
+ROOT_DIR = Path(__file__).resolve().parents[2]
+load_dotenv(ROOT_DIR / ".env")
 from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 from pathlib import Path
 import shutil
 
-from rag.pipeline import RAGPipeline
+from backend.rag.pipeline import RAGPipeline
 
 
 # =========================

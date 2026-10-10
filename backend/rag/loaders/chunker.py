@@ -1,4 +1,4 @@
-from rag.config import CHUNK_SIZE, CHUNK_OVERLAP
+from backend.rag.config import CHUNK_SIZE, CHUNK_OVERLAP
 
 
 def chunk_text(text, page_number=None):

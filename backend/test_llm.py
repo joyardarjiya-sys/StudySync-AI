@@ -1,4 +1,4 @@
-from rag.generation.llm import generate_answer
+from backend.rag.generation.llm import generate_answer
 
 
 response = generate_answer(

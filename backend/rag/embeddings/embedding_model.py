@@ -1,6 +1,6 @@
 from sentence_transformers import SentenceTransformer
 
-from rag.config import EMBEDDING_MODEL
+from backend.rag.config import EMBEDDING_MODEL
 
 
 class EmbeddingModel:

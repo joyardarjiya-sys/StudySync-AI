@@ -1,5 +1,5 @@
-from rag.loaders.document_loader import load_pdf
-from rag.processing.chunker import chunk_text
+from backend.rag.loaders.document_loader import load_pdf
+from backend.rag.processing.chunker import chunk_text
 
 
 pdf_path = "data/uploads/test.pdf"
