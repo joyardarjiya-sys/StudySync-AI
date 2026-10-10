@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 # =========================
 # BASE DIRECTORIES
 # =========================
@@ -35,13 +36,19 @@ EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 # GEMINI MODEL
 # =========================
 
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.8-flash"
 
 
 # =========================
 # CREATE DIRECTORIES
 # =========================
 
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+UPLOAD_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
 
-INDEX_DIR.mkdir(parents=True, exist_ok=True)
+INDEX_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
