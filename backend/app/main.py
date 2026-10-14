@@ -1,4 +1,5 @@
 
+from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -10,6 +11,7 @@ from pathlib import Path
 import shutil
 
 from backend.rag.pipeline import RAGPipeline
+from backend.rag.config import UPLOAD_DIR
 
 
 # =========================
@@ -21,15 +23,23 @@ app = FastAPI(
     description="RAG-based AI Tutor API",
     version="1.0.0"
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # =========================
 # UPLOAD DIRECTORY
 # =========================
 
-UPLOAD_DIR = Path("data/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-
 
 # =========================
 # LOAD RAG PIPELINE
