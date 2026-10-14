@@ -58,7 +58,7 @@ ANSWER
 """
 
         response = self.client.models.generate_content(
-            model=GEMINI_MODEL,
+            model="gemini-3.5-flash-lite",
             contents=prompt
         )
 
