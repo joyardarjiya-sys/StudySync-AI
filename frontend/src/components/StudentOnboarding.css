@@ -1,0 +1,847 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* ========================================
+   GLOBAL STYLES
+======================================== */
+
+.onboarding-page,
+.onboarding-page *,
+.onboarding-page *::before,
+.onboarding-page *::after {
+  box-sizing: border-box;
+}
+
+.onboarding-page {
+  min-height: 100vh;
+  width: 100%;
+
+  padding: 0 7% 80px;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      ellipse at 5% 5%,
+      rgba(91, 93, 255, 0.16),
+      transparent 35%
+    ),
+    radial-gradient(
+      ellipse at 95% 50%,
+      rgba(0, 194, 255, 0.09),
+      transparent 35%
+    ),
+    #080b17;
+
+  color: #f4f6ff;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* Background grid */
+
+.onboarding-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background-image:
+    linear-gradient(
+      rgba(145, 158, 255, 0.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(145, 158, 255, 0.035) 1px,
+      transparent 1px
+    );
+
+  background-size: 48px 48px;
+
+  mask-image: linear-gradient(
+    to bottom,
+    black,
+    transparent 90%
+  );
+
+  pointer-events: none;
+}
+
+/* ========================================
+   TOP NAVIGATION
+======================================== */
+
+.onboarding-header {
+  min-height: 88px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  border-bottom: 1px solid rgba(148, 163, 255, 0.10);
+}
+
+.onboarding-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.7px;
+}
+
+.onboarding-logo {
+  width: 43px;
+  height: 43px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 13px;
+
+  background: linear-gradient(
+    135deg,
+    #6675ff,
+    #18c8e8
+  );
+
+  color: #fff;
+  font-size: 22px;
+
+  box-shadow: 0 5px 25px rgba(99, 102, 241, 0.25);
+}
+
+.brand-accent {
+  color: #55d8f4;
+}
+
+/* Date in top-right */
+
+.onboarding-date {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 11px 16px;
+
+  border: 1px solid rgba(148, 163, 255, 0.15);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  color: #b7c1dc;
+  font-size: 12px;
+  font-weight: 500;
+
+  white-space: nowrap;
+}
+
+.date-indicator {
+  width: 7px;
+  height: 7px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+  background: #58d8f4;
+
+  box-shadow: 0 0 12px rgba(88, 216, 244, 0.65);
+}
+
+/* ========================================
+   MAIN CONTENT
+======================================== */
+
+.onboarding-content {
+  width: 100%;
+  max-width: 860px;
+
+  margin: 0 auto;
+  padding-top: 65px;
+
+  animation: onboardingEnter 0.65s ease both;
+}
+
+@keyframes onboardingEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   INTRODUCTION
+======================================== */
+
+.onboarding-intro {
+  margin-bottom: 42px;
+}
+
+.onboarding-badge {
+  display: inline-flex;
+  align-items: center;
+
+  margin-bottom: 23px;
+  padding: 9px 13px;
+
+  border: 1px solid rgba(129, 140, 248, 0.22);
+  border-radius: 30px;
+
+  background: rgba(99, 102, 241, 0.09);
+
+  color: #aeb8ff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+}
+
+.onboarding-intro h1 {
+  margin: 0;
+
+  color: #f8faff;
+
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(36px, 5vw, 52px);
+  font-weight: 700;
+  letter-spacing: -2px;
+  line-height: 1.17;
+}
+
+.onboarding-intro h1 span {
+  background: linear-gradient(
+    100deg,
+    #9698ff,
+    #52d8f5
+  );
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.onboarding-intro > p {
+  max-width: 570px;
+
+  margin: 20px 0 0;
+
+  color: #9ba6c1;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+/* ========================================
+   FORM CARD
+======================================== */
+
+.onboarding-form {
+  padding: 38px;
+
+  border: 1px solid rgba(148, 163, 255, 0.14);
+  border-radius: 23px;
+
+  background: rgba(15, 20, 39, 0.83);
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ========================================
+   FORM SECTIONS
+======================================== */
+
+.onboarding-section {
+  padding-bottom: 34px;
+  margin-bottom: 34px;
+
+  border-bottom: 1px solid rgba(148, 163, 255, 0.10);
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 17px;
+
+  margin-bottom: 27px;
+}
+
+.section-number {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border: 1px solid rgba(129, 140, 248, 0.22);
+  border-radius: 12px;
+
+  background: rgba(99, 102, 241, 0.10);
+
+  color: #aeb7ff;
+
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.section-heading h2 {
+  margin: 0;
+
+  color: #f5f7ff;
+
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.35px;
+}
+
+.section-heading p {
+  margin: 7px 0 0;
+
+  color: #8995b1;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ========================================
+   INPUT GRID
+======================================== */
+
+.onboarding-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 24px;
+}
+
+.onboarding-field {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+
+  min-width: 0;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.onboarding-field label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  color: #dce3f7;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.optional-label {
+  color: #737f9d;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+/* Input and select fields */
+
+.onboarding-field input,
+.onboarding-field select {
+  display: block;
+
+  width: 100%;
+  height: 51px;
+
+  padding: 0 15px;
+
+  border: 1px solid rgba(148, 163, 210, 0.17);
+  border-radius: 11px;
+
+  outline: none;
+
+  background-color: #101529;
+
+  color: #f3f5ff;
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background-color 0.22s ease;
+}
+
+.onboarding-field select {
+  cursor: pointer;
+}
+
+.onboarding-field select option {
+  background: #101529;
+  color: #f3f5ff;
+}
+
+.onboarding-field input::placeholder {
+  color: #626e8a;
+  opacity: 1;
+}
+
+.onboarding-field input:hover,
+.onboarding-field select:hover {
+  border-color: rgba(129, 140, 248, 0.36);
+}
+
+.onboarding-field input:focus,
+.onboarding-field select:focus {
+  border-color: #818cf8;
+
+  background-color: #11172d;
+
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.11);
+}
+
+/* ========================================
+   SKILL SELECTION
+======================================== */
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+.skill-option {
+  min-height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+
+  padding: 12px;
+
+  border: 1px solid rgba(148, 163, 210, 0.15);
+  border-radius: 11px;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  color: #aab4ce;
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.skill-option:hover {
+  transform: translateY(-1px);
+
+  border-color: rgba(129, 140, 248, 0.42);
+  background: rgba(99, 102, 241, 0.07);
+
+  color: #fff;
+}
+
+.skill-check {
+  width: 20px;
+  height: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border: 1px solid rgba(148, 163, 210, 0.24);
+  border-radius: 6px;
+
+  color: #8793b2;
+  font-size: 13px;
+
+  transition: all 0.2s ease;
+}
+
+.skill-option.selected {
+  border-color: rgba(117, 129, 255, 0.65);
+
+  background: linear-gradient(
+    120deg,
+    rgba(99, 102, 241, 0.15),
+    rgba(6, 182, 212, 0.07)
+  );
+
+  color: #eef0ff;
+}
+
+.skill-option.selected .skill-check {
+  border-color: transparent;
+
+  background: linear-gradient(
+    135deg,
+    #6977ff,
+    #28c9e9
+  );
+
+  color: #fff;
+}
+
+.skills-hint {
+  margin: 16px 0 0;
+
+  color: #77839f;
+  font-size: 11px;
+}
+
+/* ========================================
+   DAILY GOALS
+======================================== */
+
+.daily-goal-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+.daily-goal-option {
+  min-height: 46px;
+
+  padding: 11px 8px;
+
+  border: 1px solid rgba(148, 163, 210, 0.16);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  color: #a6b0c9;
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.daily-goal-option:hover {
+  border-color: rgba(129, 140, 248, 0.4);
+  color: #fff;
+}
+
+.daily-goal-option.selected {
+  border-color: #727eff;
+
+  background: rgba(99, 102, 241, 0.13);
+
+  color: #c8cdff;
+
+  box-shadow: inset 0 0 15px rgba(99, 102, 241, 0.04);
+}
+
+/* ========================================
+   ERROR MESSAGE
+======================================== */
+
+.onboarding-error {
+  margin-bottom: 22px;
+  padding: 13px 15px;
+
+  border: 1px solid rgba(248, 113, 113, 0.22);
+  border-radius: 11px;
+
+  background: rgba(239, 68, 68, 0.08);
+
+  color: #fca5a5;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ========================================
+   SUBMIT BUTTON
+======================================== */
+
+.onboarding-submit {
+  width: 100%;
+  min-height: 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  padding: 15px 20px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+
+  background: linear-gradient(
+    105deg,
+    #5e6af8,
+    #7960f5 55%,
+    #1bbddd
+  );
+
+  color: #fff;
+
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 9px 28px rgba(91, 94, 255, 0.20);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
+}
+
+.onboarding-submit:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 14px 35px rgba(91, 94, 255, 0.30);
+
+  filter: brightness(1.08);
+}
+
+.onboarding-submit:active {
+  transform: translateY(0);
+}
+
+.onboarding-submit:focus-visible {
+  outline: 2px solid #a5b4ff;
+  outline-offset: 4px;
+}
+
+.onboarding-submit span {
+  font-size: 19px;
+
+  transition: transform 0.2s ease;
+}
+
+.onboarding-submit:hover span {
+  transform: translateX(4px);
+}
+
+/* ========================================
+   FOOTER
+======================================== */
+
+.onboarding-footer {
+  margin: 23px 0 0;
+
+  color: #6f7a96;
+
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 900px) {
+  .onboarding-page {
+    padding-right: 5%;
+    padding-left: 5%;
+  }
+
+  .onboarding-content {
+    padding-top: 50px;
+  }
+
+  .onboarding-form {
+    padding: 30px;
+  }
+
+  .skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .onboarding-page {
+    padding: 0 17px 45px;
+  }
+
+  .onboarding-header {
+    min-height: 76px;
+  }
+
+  .onboarding-brand {
+    gap: 9px;
+    font-size: 17px;
+  }
+
+  .onboarding-logo {
+    width: 37px;
+    height: 37px;
+    border-radius: 11px;
+    font-size: 19px;
+  }
+
+  .onboarding-date {
+    gap: 7px;
+    padding: 9px 10px;
+
+    font-size: 10px;
+    white-space: normal;
+  }
+
+  .date-indicator {
+    width: 6px;
+    height: 6px;
+  }
+
+  .onboarding-content {
+    padding-top: 42px;
+  }
+
+  .onboarding-intro {
+    margin-bottom: 30px;
+  }
+
+  .onboarding-badge {
+    margin-bottom: 19px;
+    font-size: 9px;
+    letter-spacing: 1.3px;
+  }
+
+  .onboarding-intro h1 {
+    font-size: 36px;
+    letter-spacing: -1.4px;
+  }
+
+  .onboarding-intro > p {
+    margin-top: 15px;
+    font-size: 12px;
+  }
+
+  .onboarding-form {
+    padding: 23px 18px;
+    border-radius: 18px;
+  }
+
+  .onboarding-section {
+    padding-bottom: 27px;
+    margin-bottom: 27px;
+  }
+
+  .section-heading {
+    gap: 12px;
+    margin-bottom: 23px;
+  }
+
+  .section-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .section-heading h2 {
+    font-size: 17px;
+  }
+
+  .section-heading p {
+    font-size: 11px;
+  }
+
+  .onboarding-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+
+  .skills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .skill-option {
+    gap: 7px;
+    padding: 10px 8px;
+    font-size: 10px;
+  }
+
+  .skill-check {
+    width: 18px;
+    height: 18px;
+  }
+
+  .daily-goal-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .onboarding-submit {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .onboarding-page {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .onboarding-date {
+    max-width: 155px;
+    font-size: 9px;
+  }
+
+  .onboarding-intro h1 {
+    font-size: 31px;
+  }
+
+  .onboarding-form {
+    padding: 19px 14px;
+  }
+
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-page *,
+  .onboarding-page *::before,
+  .onboarding-page *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
