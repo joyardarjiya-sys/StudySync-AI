@@ -64,6 +64,19 @@ jobs:
           
           
       - name: Install backend dependencies
+        docker-build:
+    name: Validate Docker Images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -t studysync-backend:ci ./backend
+
+      - name: Build frontend image
+        run: docker build -t studysync-frontend:ci ./frontend
         run: python -m pip install -r requirements.txt pytest
 
       - name: Verify pytest installation
